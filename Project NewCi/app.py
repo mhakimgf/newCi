@@ -8,6 +8,14 @@ from flask import Flask, render_template
 from db import get_connection
 from flask_sqlalchemy import SQLAlchemy
 
+# Variabel untuk koneksi
+server = 'LAPTOP-9Q8UL4FR\\SQLEXPRESS'
+username = 'AkunTubes'
+password = 'mibd04'
+database = 'manpro'
+driver = 'ODBC Driver 17 for SQL Server'
+trusted_connection = 'yes'
+
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
 
@@ -53,15 +61,22 @@ def dashboard():
 def list_machines():
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Mesin_Cuci")
+    cursor.execute("SELECT * FROM Mesin_Cuci where Status = 0")
     machines = cursor.fetchall()
     return render_template("machines.html", machines=machines)
 
 
 
+
+
+# Membuat SQLAlchemy database URI dari variabel-variabel di atas
+connection_string = (
+    f'mssql+pyodbc://{username}:{password}@{server}/{database}?'
+    f'driver={driver};trusted_connection={trusted_connection}'
+)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    'mssql+pyodbc://AkunTubes:mibd04@LAPTOP-9Q8UL4FR\\SQLEXPRESS/manpro?'
-    'driver=ODBC+Driver+17+for+SQL+Server;trusted_connection=yes'
+    connection_string
 )
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
